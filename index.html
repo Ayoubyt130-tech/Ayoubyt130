@@ -1,680 +1,366 @@
-import React, { useState, useEffect } from 'react';
-import { Search, Menu, Video, Home, Send, Users, Heart, MessageCircle, UserPlus, X, ArrowLeft, Upload } from 'lucide-react';
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Ayoubyt130 — HTML نسخة</title>
 
-export default function SocialMediaApp() {
-  const [selectedTab, setSelectedTab] = useState('home');
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [showLoginModal, setShowLoginModal] = useState(false);
-  const [username, setUsername] = useState('');
-  const [loggedInUser, setLoggedInUser] = useState('');
-  const [showAddFriendModal, setShowAddFriendModal] = useState(false);
-  const [searchFriendQuery, setSearchFriendQuery] = useState('');
-  const [selectedChat, setSelectedChat] = useState(null);
-  const [messageInput, setMessageInput] = useState('');
-  const [showProfileModal, setShowProfileModal] = useState(false);
-  const [newUsername, setNewUsername] = useState('');
-  const [userAvatar, setUserAvatar] = useState('bg-gradient-to-br from-purple-500 to-pink-500');
-  const [customAvatarUrl, setCustomAvatarUrl] = useState(null);
+  <!-- Tailwind CDN (development) -->
+  <script src="https://cdn.tailwindcss.com"></script>
 
-  const [friends, setFriends] = useState([
-    { id: 1, username: 'DevAyoubyt130', avatar: 'bg-gradient-to-br from-pink-400 to-purple-500', online: true },
-    { id: 2, username: 'Admin', avatar: 'bg-gradient-to-br from-blue-400 to-cyan-500', online: true },
-    { id: 3, username: 'bot', avatar: 'bg-gradient-to-br from-orange-400 to-red-500', online: false },
-  ]);
+  <!-- Lucide icons -->
+  <script src="https://unpkg.com/lucide/dist/lucide.min.js"></script>
 
-  const [posts, setPosts] = useState([
-    {
-      id: 1,
-      user: 'sarah_designs',
-      avatar: 'bg-gradient-to-br from-pink-400 to-purple-500',
-      image: 'bg-gradient-to-br from-purple-300 via-pink-300 to-red-300',
-      likes: 234,
-      caption: 'New design project! What do you think? 🎨',
-      comments: 12,
-      liked: false,
-      time: '2h ago'
-    },
-    {
-      id: 2,
-      user: 'mike_dev',
-      avatar: 'bg-gradient-to-br from-blue-400 to-cyan-500',
-      image: 'bg-gradient-to-br from-blue-400 via-cyan-300 to-teal-400',
-      likes: 189,
-      caption: 'Coding session ☕💻',
-      comments: 8,
-      liked: false,
-      time: '4h ago'
-    },
-    {
-      id: 3,
-      user: 'alex_photo',
-      avatar: 'bg-gradient-to-br from-orange-400 to-red-500',
-      image: 'bg-gradient-to-br from-yellow-300 via-orange-300 to-pink-400',
-      likes: 567,
-      caption: 'Golden hour shots 📸✨',
-      comments: 23,
-      liked: false,
-      time: '6h ago'
-    },
-  ]);
+  <style>
+    /* small helper to mimic aspect-square from Tailwind if old browsers */
+    .aspect-square { aspect-ratio: 1 / 1; }
+    /* keep body font direction and basic bg similar to component */
+    body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
+  </style>
+</head>
+<body class="bg-gray-50 antialiased">
 
-  const [chats, setChats] = useState([
-    { id: 1, username: 'sarah_designs', avatar: 'bg-gradient-to-br from-pink-400 to-purple-500', lastMessage: 'That looks amazing!', time: '2m ago', unread: 2 },
-    { id: 2, username: 'mike_dev', avatar: 'bg-gradient-to-br from-blue-400 to-cyan-500', lastMessage: 'Let me check that out', time: '1h ago', unread: 0 },
-    { id: 3, username: 'alex_photo', avatar: 'bg-gradient-to-br from-orange-400 to-red-500', lastMessage: 'Thanks!', time: '3h ago', unread: 0 },
-  ]);
-
-  const [messages, setMessages] = useState({
-    1: [
-      { id: 1, text: 'Hey! How are you?', sender: 'sarah_designs', time: '10:30 AM' },
-      { id: 2, text: 'I\'m good! Just working on a new project', sender: 'me', time: '10:32 AM' },
-      { id: 3, text: 'That looks amazing!', sender: 'sarah_designs', time: '10:35 AM' },
-    ],
-    2: [
-      { id: 1, text: 'Did you see the new React update?', sender: 'mike_dev', time: '9:15 AM' },
-      { id: 2, text: 'Not yet, what\'s new?', sender: 'me', time: '9:20 AM' },
-      { id: 3, text: 'Let me check that out', sender: 'mike_dev', time: '9:25 AM' },
-    ],
-    3: [
-      { id: 1, text: 'Love your photos!', sender: 'me', time: 'Yesterday' },
-      { id: 2, text: 'Thanks!', sender: 'alex_photo', time: 'Yesterday' },
-    ],
-  });
-
-  const suggestedFriends = [
-    { id: 4, username: 'emma_travel', avatar: 'bg-gradient-to-br from-green-400 to-teal-500' },
-    { id: 5, username: 'david_fitness', avatar: 'bg-gradient-to-br from-yellow-400 to-orange-500' },
-    { id: 6, username: 'lisa_cook', avatar: 'bg-gradient-to-br from-red-400 to-pink-500' },
-  ];
-
-  const avatarOptions = [
-    'bg-gradient-to-br from-purple-500 to-pink-500',
-    'bg-gradient-to-br from-blue-500 to-cyan-500',
-    'bg-gradient-to-br from-green-500 to-teal-500',
-    'bg-gradient-to-br from-orange-500 to-red-500',
-    'bg-gradient-to-br from-yellow-500 to-orange-500',
-    'bg-gradient-to-br from-pink-500 to-red-500',
-    'bg-gradient-to-br from-indigo-500 to-purple-500',
-    'bg-gradient-to-br from-teal-500 to-green-500',
-  ];
-
-  const handleLogout = () => {
-    setIsLoggedIn(false);
-    setLoggedInUser('');
-    setSelectedTab('home');
-  };
-
-  const handleLike = (postId) => {
-    setPosts(posts.map(post => 
-      post.id === postId 
-        ? { ...post, liked: !post.liked, likes: post.liked ? post.likes - 1 : post.likes + 1 }
-        : post
-    ));
-  };
-
-  const handleAddFriend = (friend) => {
-    if (!friends.find(f => f.id === friend.id)) {
-      setFriends([...friends, { ...friend, online: false }]);
-      setChats([...chats, { 
-        id: friend.id, 
-        username: friend.username, 
-        avatar: friend.avatar, 
-        lastMessage: 'Say hi!', 
-        time: 'now', 
-        unread: 0 
-      }]);
-      setMessages({ ...messages, [friend.id]: [] });
-    }
-    setShowAddFriendModal(false);
-    setSearchFriendQuery('');
-  };
-
-  const handleSendMessage = () => {
-    if (messageInput.trim() && selectedChat) {
-      const newMessage = {
-        id: Date.now(),
-        text: messageInput,
-        sender: 'me',
-        time: 'Just now'
-      };
-      setMessages({
-        ...messages,
-        [selectedChat.id]: [...(messages[selectedChat.id] || []), newMessage]
-      });
-      setChats(chats.map(chat => 
-        chat.id === selectedChat.id 
-          ? { ...chat, lastMessage: messageInput, time: 'now' }
-          : chat
-      ));
-      setMessageInput('');
-    }
-  };
-
-  const handleUpdateProfile = () => {
-    if (newUsername.trim()) {
-      setLoggedInUser(newUsername);
-      setNewUsername('');
-    }
-    setShowProfileModal(false);
-  };
-
-  const handleFileUpload = (e) => {
-    const file = e.target.files[0];
-    if (file && file.type.startsWith('image/')) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        setCustomAvatarUrl(event.target.result);
-        setUserAvatar('');
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  if (!isLoggedIn) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-purple-500 via-pink-500 to-red-500">
-        <div className="bg-white rounded-lg p-8 w-96 shadow-2xl">
-          <div className="flex flex-col items-center mb-6">
-            <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center mb-4">
-              <Users className="w-9 h-9 text-white" />
-            </div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-              Ayoubyt130
-            </h1>
-            <p className="text-gray-600 text-sm mt-2">Connect with friends</p>
-          </div>
-          <div>
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Username
-              </label>
-              <input
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="Enter your username"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                autoFocus
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter' && username.trim()) {
-                    setLoggedInUser(username);
-                    setIsLoggedIn(true);
-                    setUsername('');
-                  }
-                }}
-              />
-            </div>
-            <button
-              onClick={() => {
-                if (username.trim()) {
-                  setLoggedInUser(username);
-                  setIsLoggedIn(true);
-                  setUsername('');
-                }
-              }}
-              className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-3 rounded-lg hover:from-purple-600 hover:to-pink-600 font-medium"
-            >
-              Sign In
-            </button>
-          </div>
+  <!-- ==================================================
+       Login view (the TSX had this when !isLoggedIn)
+       ================================================== -->
+  <!--
+  <div class="flex items-center justify-center min-h-screen bg-gradient-to-br from-purple-500 via-pink-500 to-red-500">
+    <div class="bg-white rounded-lg p-8 w-96 shadow-2xl">
+      <div class="flex flex-col items-center mb-6">
+        <div class="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center mb-4">
+          <i data-lucide="users" class="w-9 h-9 text-white"></i>
         </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="flex flex-col h-screen bg-gray-50">
-      {/* Profile Edit Modal */}
-      {showProfileModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-96 max-h-[80vh] overflow-y-auto">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold">Edit Profile</h2>
-              <button
-                onClick={() => setShowProfileModal(false)}
-                className="p-1 hover:bg-gray-100 rounded-full"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-3">Profile Picture</label>
-              
-              {/* Upload from device */}
-              <div className="mb-4">
-                <label className="w-full cursor-pointer">
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 hover:border-purple-500 transition-colors text-center">
-                    <div className="flex flex-col items-center">
-                      <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-2">
-                        {customAvatarUrl ? (
-                          <img src={customAvatarUrl} alt="Avatar" className="w-full h-full rounded-full object-cover" />
-                        ) : (
-                          <Upload className="w-8 h-8 text-gray-400" />
-                        )}
-                      </div>
-                      <span className="text-sm text-gray-600">Upload from device</span>
-                      <span className="text-xs text-gray-400 mt-1">Click to choose image</span>
-                    </div>
-                  </div>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleFileUpload}
-                    className="hidden"
-                  />
-                </label>
-              </div>
-
-              {/* Preset colors */}
-              <div className="mb-2">
-                <span className="text-sm text-gray-600 mb-2 block">Or choose a color:</span>
-              </div>
-              <div className="grid grid-cols-4 gap-3">
-                {avatarOptions.map((avatar, index) => (
-                  <button
-                    key={index}
-                    onClick={() => {
-                      setUserAvatar(avatar);
-                      setCustomAvatarUrl(null);
-                    }}
-                    className={`w-16 h-16 ${avatar} rounded-full flex items-center justify-center hover:scale-110 transition-transform ${
-                      userAvatar === avatar && !customAvatarUrl ? 'ring-4 ring-purple-500' : ''
-                    }`}
-                  >
-                    <span className="text-white font-bold text-xl">
-                      {loggedInUser.charAt(0).toUpperCase()}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">Username</label>
-              <input
-                type="text"
-                value={newUsername}
-                onChange={(e) => setNewUsername(e.target.value)}
-                placeholder={loggedInUser}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-              />
-            </div>
-
-            <button
-              onClick={handleUpdateProfile}
-              className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-2 rounded-lg hover:from-purple-600 hover:to-pink-600 font-medium"
-            >
-              Save Changes
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Add Friend Modal */}
-      {showAddFriendModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-96 max-h-[80vh] overflow-y-auto">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold">Add Friends</h2>
-              <button
-                onClick={() => setShowAddFriendModal(false)}
-                className="p-1 hover:bg-gray-100 rounded-full"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            <input
-              type="text"
-              value={searchFriendQuery}
-              onChange={(e) => setSearchFriendQuery(e.target.value)}
-              placeholder="Search users..."
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-purple-500"
-            />
-            <div className="space-y-3">
-              <h3 className="text-sm font-semibold text-gray-600">Suggested</h3>
-              {suggestedFriends
-                .filter(f => f.username.toLowerCase().includes(searchFriendQuery.toLowerCase()))
-                .map((friend) => (
-                  <div key={friend.id} className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className={`w-12 h-12 ${friend.avatar} rounded-full flex items-center justify-center`}>
-                        <span className="text-white font-bold">
-                          {friend.username.charAt(0).toUpperCase()}
-                        </span>
-                      </div>
-                      <span className="font-medium">{friend.username}</span>
-                    </div>
-                    <button
-                      onClick={() => handleAddFriend(friend)}
-                      className="px-4 py-1.5 bg-purple-500 text-white rounded-lg hover:bg-purple-600 text-sm"
-                    >
-                      Add
-                    </button>
-                  </div>
-                ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Header */}
-      <header className="flex items-center justify-between px-4 py-3 bg-white border-b border-gray-200">
-        <div className="flex items-center gap-2">
-          <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
-            <Users className="w-6 h-6 text-white" />
-          </div>
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-            Ayoubyt130
-          </h1>
-        </div>
-
-        <div className="flex-1 max-w-md mx-8">
-          <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden">
-            <Search className="w-5 h-5 ml-3 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search..."
-              className="flex-1 px-3 py-2 outline-none"
-            />
-          </div>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => setShowAddFriendModal(true)}
-            className="p-2 hover:bg-gray-100 rounded-full"
-            title="Add Friends"
-          >
-            <UserPlus className="w-6 h-6" />
-          </button>
-          <div className="relative group">
-            <button 
-              onClick={() => setShowProfileModal(true)}
-              className="flex items-center gap-2 p-2 hover:bg-gray-100 rounded-full"
-            >
-              <div className={`w-9 h-9 ${customAvatarUrl ? '' : userAvatar} rounded-full flex items-center justify-center overflow-hidden`}>
-                {customAvatarUrl ? (
-                  <img src={customAvatarUrl} alt="Profile" className="w-full h-full object-cover" />
-                ) : (
-                  <span className="text-white font-bold text-sm">
-                    {loggedInUser.charAt(0).toUpperCase()}
-                  </span>
-                )}
-              </div>
-            </button>
-            <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
-              <div className="p-4 border-b border-gray-200">
-                <p className="font-semibold">{loggedInUser}</p>
-              </div>
-              <button
-                onClick={() => setShowProfileModal(true)}
-                className="w-full px-4 py-2 text-left hover:bg-gray-100 text-sm"
-              >
-                Edit Profile
-              </button>
-              <button
-                onClick={handleLogout}
-                className="w-full px-4 py-2 text-left hover:bg-gray-100 text-sm"
-              >
-                Sign Out
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <div className="flex flex-1 overflow-hidden">
-        {/* Main Content */}
-        {selectedTab === 'home' && (
-          <main className="flex-1 overflow-y-auto">
-            <div className="max-w-2xl mx-auto py-6 space-y-6">
-              {posts.map((post) => (
-                <div key={post.id} className="bg-white rounded-lg border border-gray-200">
-                  {/* Post Header */}
-                  <div className="flex items-center justify-between p-4">
-                    <div className="flex items-center gap-3">
-                      <div className={`w-10 h-10 ${post.avatar} rounded-full flex items-center justify-center`}>
-                        <span className="text-white font-bold">
-                          {post.user.charAt(0).toUpperCase()}
-                        </span>
-                      </div>
-                      <div>
-                        <p className="font-semibold">{post.user}</p>
-                        <p className="text-xs text-gray-500">{post.time}</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Post Image */}
-                  <div className={`${post.image} aspect-square w-full`}></div>
-
-                  {/* Post Actions */}
-                  <div className="p-4">
-                    <div className="flex items-center gap-4 mb-3">
-                      <button
-                        onClick={() => handleLike(post.id)}
-                        className="hover:opacity-70 transition-opacity"
-                      >
-                        <Heart
-                          className={`w-7 h-7 ${post.liked ? 'fill-red-500 text-red-500' : 'text-gray-800'}`}
-                        />
-                      </button>
-                      <button className="hover:opacity-70 transition-opacity">
-                        <MessageCircle className="w-7 h-7" />
-                      </button>
-                      <button className="hover:opacity-70 transition-opacity">
-                        <Send className="w-7 h-7" />
-                      </button>
-                    </div>
-
-                    <p className="font-semibold mb-2">{post.likes} likes</p>
-                    <p>
-                      <span className="font-semibold">{post.user}</span> {post.caption}
-                    </p>
-                    <button className="text-gray-500 text-sm mt-2">
-                      View all {post.comments} comments
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </main>
-        )}
-
-        {/* Messages View */}
-        {selectedTab === 'messages' && (
-          <div className="flex flex-1">
-            {/* Chat List */}
-            <div className="w-96 bg-white border-r border-gray-200 overflow-y-auto">
-              <div className="p-4 border-b border-gray-200">
-                <h2 className="text-xl font-bold">{loggedInUser}</h2>
-                <p className="text-sm text-gray-600">Messages</p>
-              </div>
-              <div>
-                {chats.map((chat) => (
-                  <button
-                    key={chat.id}
-                    onClick={() => setSelectedChat(chat)}
-                    className={`w-full flex items-center gap-3 p-4 hover:bg-gray-50 border-b border-gray-100 ${
-                      selectedChat?.id === chat.id ? 'bg-gray-100' : ''
-                    }`}
-                  >
-                    <div className={`w-14 h-14 ${chat.avatar} rounded-full flex items-center justify-center relative`}>
-                      <span className="text-white font-bold">
-                        {chat.username.charAt(0).toUpperCase()}
-                      </span>
-                      {friends.find(f => f.id === chat.id)?.online && (
-                        <div className="absolute bottom-0 right-0 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
-                      )}
-                    </div>
-                    <div className="flex-1 text-left">
-                      <p className="font-semibold">{chat.username}</p>
-                      <p className="text-sm text-gray-600 truncate">{chat.lastMessage}</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-xs text-gray-500">{chat.time}</p>
-                      {chat.unread > 0 && (
-                        <span className="inline-block mt-1 px-2 py-0.5 bg-purple-500 text-white text-xs rounded-full">
-                          {chat.unread}
-                        </span>
-                      )}
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Chat Window */}
-            {selectedChat ? (
-              <div className="flex-1 flex flex-col bg-white">
-                {/* Chat Header */}
-                <div className="flex items-center gap-3 p-4 border-b border-gray-200">
-                  <button
-                    onClick={() => setSelectedChat(null)}
-                    className="lg:hidden p-2 hover:bg-gray-100 rounded-full"
-                  >
-                    <ArrowLeft className="w-5 h-5" />
-                  </button>
-                  <div className={`w-10 h-10 ${selectedChat.avatar} rounded-full flex items-center justify-center`}>
-                    <span className="text-white font-bold">
-                      {selectedChat.username.charAt(0).toUpperCase()}
-                    </span>
-                  </div>
-                  <div>
-                    <p className="font-semibold">{selectedChat.username}</p>
-                    <p className="text-xs text-gray-500">
-                      {friends.find(f => f.id === selectedChat.id)?.online ? 'Active now' : 'Offline'}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Messages */}
-                <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                  {messages[selectedChat.id]?.map((msg) => (
-                    <div
-                      key={msg.id}
-                      className={`flex ${msg.sender === 'me' ? 'justify-end' : 'justify-start'}`}
-                    >
-                      <div
-                        className={`max-w-xs px-4 py-2 rounded-2xl ${
-                          msg.sender === 'me'
-                            ? 'bg-purple-500 text-white'
-                            : 'bg-gray-200 text-gray-800'
-                        }`}
-                      >
-                        <p>{msg.text}</p>
-                        <p className={`text-xs mt-1 ${msg.sender === 'me' ? 'text-purple-200' : 'text-gray-500'}`}>
-                          {msg.time}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Message Input */}
-                <div className="p-4 border-t border-gray-200">
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="text"
-                      value={messageInput}
-                      onChange={(e) => setMessageInput(e.target.value)}
-                      onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                      placeholder="Type a message..."
-                      className="flex-1 px-4 py-2 border border-gray-300 rounded-full outline-none focus:ring-2 focus:ring-purple-500"
-                    />
-                    <button
-                      onClick={handleSendMessage}
-                      className="p-2 bg-purple-500 text-white rounded-full hover:bg-purple-600"
-                    >
-                      <Send className="w-5 h-5" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="flex-1 flex items-center justify-center bg-white">
-                <div className="text-center">
-                  <MessageCircle className="w-20 h-20 text-gray-300 mx-auto mb-4" />
-                  <p className="text-gray-600">Select a chat to start messaging</p>
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Friends List */}
-        {selectedTab === 'friends' && (
-          <main className="flex-1 overflow-y-auto bg-white">
-            <div className="max-w-2xl mx-auto p-6">
-              <h2 className="text-2xl font-bold mb-6">Friends</h2>
-              <div className="space-y-4">
-                {friends.map((friend) => (
-                  <div key={friend.id} className="flex items-center justify-between p-4 hover:bg-gray-50 rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <div className={`w-14 h-14 ${friend.avatar} rounded-full flex items-center justify-center relative`}>
-                        <span className="text-white font-bold text-lg">
-                          {friend.username.charAt(0).toUpperCase()}
-                        </span>
-                        {friend.online && (
-                          <div className="absolute bottom-0 right-0 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
-                        )}
-                      </div>
-                      <div>
-                        <p className="font-semibold">{friend.username}</p>
-                        <p className="text-sm text-gray-500">{friend.online ? 'Active now' : 'Offline'}</p>
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => {
-                        setSelectedTab('messages');
-                        setSelectedChat(chats.find(c => c.id === friend.id));
-                      }}
-                      className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600"
-                    >
-                      Message
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </main>
-        )}
+        <h1 class="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">Ayoubyt130</h1>
+        <p class="text-gray-600 text-sm mt-2">Connect with friends</p>
       </div>
 
-      {/* Bottom Navigation */}
-      <nav className="flex justify-around items-center bg-white border-t border-gray-200 py-2">
-        <button
-          onClick={() => setSelectedTab('home')}
-          className={`flex flex-col items-center py-2 px-6 ${
-            selectedTab === 'home' ? 'text-purple-600' : 'text-gray-600'
-          }`}
-        >
-          <Home className="w-7 h-7" />
-          <span className="text-xs mt-1">Home</span>
-        </button>
-        <button
-          onClick={() => setSelectedTab('friends')}
-          className={`flex flex-col items-center py-2 px-6 ${
-            selectedTab === 'friends' ? 'text-purple-600' : 'text-gray-600'
-          }`}
-        >
-          <Users className="w-7 h-7" />
-          <span className="text-xs mt-1">Friends</span>
-        </button>
-        <button
-          onClick={() => setSelectedTab('messages')}
-          className={`flex flex-col items-center py-2 px-6 relative ${
-            selectedTab === 'messages' ? 'text-purple-600' : 'text-gray-600'
-          }`}
-        >
-          <MessageCircle className="w-7 h-7" />
-          <span className="text-xs mt-1">Messages</span>
-          {chats.some(c => c.unread > 0) && (
-            <span className="absolute top-1 right-4 w-2 h-2 bg-red-500 rounded-full"></span>
-          )}
-        </button>
-      </nav>
+      <div>
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Username</label>
+          <input type="text" placeholder="Enter your username"
+                 class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" />
+        </div>
+        <button class="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-3 rounded-lg hover:from-purple-600 hover:to-pink-600 font-medium">Sign In</button>
+      </div>
     </div>
-  );
-}
+  </div>
+  -->
+
+  <!-- ==================================================
+       Main app (logged-in view) — converted markup
+       ================================================== -->
+  <div class="flex flex-col min-h-screen" id="app-root">
+
+    <!-- Profile Edit Modal (hidden by default visually; present in DOM) -->
+    <div class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" id="profile-modal">
+      <div class="bg-white rounded-lg p-6 w-96 max-h-[80vh] overflow-y-auto">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-xl font-bold">Edit Profile</h2>
+          <button class="p-1 hover:bg-gray-100 rounded-full">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <div class="mb-6">
+          <label class="block text-sm font-medium text-gray-700 mb-3">Profile Picture</label>
+
+          <div class="mb-4">
+            <label class="w-full cursor-pointer">
+              <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 hover:border-purple-500 transition-colors text-center">
+                <div class="flex flex-col items-center">
+                  <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-2">
+                    <i data-lucide="upload" class="w-8 h-8 text-gray-400"></i>
+                  </div>
+                  <span class="text-sm text-gray-600">Upload from device</span>
+                  <span class="text-xs text-gray-400 mt-1">Click to choose image</span>
+                </div>
+              </div>
+              <input type="file" accept="image/*" class="hidden" />
+            </label>
+          </div>
+
+          <div class="mb-2">
+            <span class="text-sm text-gray-600 mb-2 block">Or choose a color:</span>
+          </div>
+          <div class="grid grid-cols-4 gap-3">
+            <button class="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center hover:scale-110 transition-transform">
+              <span class="text-white font-bold text-xl">A</span>
+            </button>
+            <button class="w-16 h-16 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-full flex items-center justify-center hover:scale-110 transition-transform">
+              <span class="text-white font-bold text-xl">A</span>
+            </button>
+            <button class="w-16 h-16 bg-gradient-to-br from-green-500 to-teal-500 rounded-full flex items-center justify-center hover:scale-110 transition-transform">
+              <span class="text-white font-bold text-xl">A</span>
+            </button>
+            <button class="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-500 rounded-full flex items-center justify-center hover:scale-110 transition-transform">
+              <span class="text-white font-bold text-xl">A</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="mb-6">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Username</label>
+          <input type="text" placeholder="Ayoubyt130" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"/>
+        </div>
+
+        <button class="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-2 rounded-lg hover:from-purple-600 hover:to-pink-600 font-medium">Save Changes</button>
+      </div>
+    </div>
+
+    <!-- Add Friend Modal (hidden) -->
+    <div class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" id="add-friend-modal">
+      <div class="bg-white rounded-lg p-6 w-96 max-h-[80vh] overflow-y-auto">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-xl font-bold">Add Friends</h2>
+          <button class="p-1 hover:bg-gray-100 rounded-full">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <input type="text" placeholder="Search users..." class="w-full px-4 py-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-purple-500"/>
+
+        <div class="space-y-3">
+          <h3 class="text-sm font-semibold text-gray-600">Suggested</h3>
+
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 bg-gradient-to-br from-green-400 to-teal-500 rounded-full flex items-center justify-center">
+                <span class="text-white font-bold">E</span>
+              </div>
+              <span class="font-medium">emma_travel</span>
+            </div>
+            <button class="px-4 py-1.5 bg-purple-500 text-white rounded-lg hover:bg-purple-600 text-sm">Add</button>
+          </div>
+
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center">
+                <span class="text-white font-bold">D</span>
+              </div>
+              <span class="font-medium">david_fitness</span>
+            </div>
+            <button class="px-4 py-1.5 bg-purple-500 text-white rounded-lg hover:bg-purple-600 text-sm">Add</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Header -->
+    <header class="flex items-center justify-between px-4 py-3 bg-white border-b border-gray-200">
+      <div class="flex items-center gap-2">
+        <div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
+          <i data-lucide="users" class="w-6 h-6 text-white"></i>
+        </div>
+        <h1 class="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">Ayoubyt130</h1>
+      </div>
+
+      <div class="flex-1 max-w-md mx-8">
+        <div class="flex items-center border border-gray-300 rounded-lg overflow-hidden">
+          <i data-lucide="search" class="w-5 h-5 ml-3 text-gray-400"></i>
+          <input type="text" placeholder="Search..." class="flex-1 px-3 py-2 outline-none"/>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <button class="p-2 hover:bg-gray-100 rounded-full" title="Add Friends">
+          <i data-lucide="user-plus" class="w-6 h-6"></i>
+        </button>
+
+        <div class="relative group">
+          <button class="flex items-center gap-2 p-2 hover:bg-gray-100 rounded-full">
+            <div class="w-9 h-9 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center overflow-hidden">
+              <span class="text-white font-bold text-sm">A</span>
+            </div>
+          </button>
+
+          <div class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
+            <div class="p-4 border-b border-gray-200">
+              <p class="font-semibold">Ayoubyt130</p>
+            </div>
+            <button class="w-full px-4 py-2 text-left hover:bg-gray-100 text-sm">Edit Profile</button>
+            <button class="w-full px-4 py-2 text-left hover:bg-gray-100 text-sm">Sign Out</button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="flex flex-1 overflow-hidden">
+
+      <!-- Main Content area (Home posts) -->
+      <main class="flex-1 overflow-y-auto bg-gray-50">
+        <div class="max-w-2xl mx-auto py-6 space-y-6">
+          <!-- Post 1 -->
+          <article class="bg-white rounded-lg border border-gray-200">
+            <div class="flex items-center justify-between p-4">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-gradient-to-br from-pink-400 to-purple-500 rounded-full flex items-center justify-center">
+                  <span class="text-white font-bold">S</span>
+                </div>
+                <div>
+                  <p class="font-semibold">sarah_designs</p>
+                  <p class="text-xs text-gray-500">2h ago</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-gradient-to-br from-purple-300 via-pink-300 to-red-300 aspect-square w-full"></div>
+
+            <div class="p-4">
+              <div class="flex items-center gap-4 mb-3">
+                <button class="hover:opacity-70 transition-opacity">
+                  <i data-lucide="heart" class="w-7 h-7"></i>
+                </button>
+                <button class="hover:opacity-70 transition-opacity">
+                  <i data-lucide="message-circle" class="w-7 h-7"></i>
+                </button>
+                <button class="hover:opacity-70 transition-opacity">
+                  <i data-lucide="send" class="w-7 h-7"></i>
+                </button>
+              </div>
+
+              <p class="font-semibold mb-2">234 likes</p>
+              <p><span class="font-semibold">sarah_designs</span> New design project! What do you think? 🎨</p>
+              <button class="text-gray-500 text-sm mt-2">View all 12 comments</button>
+            </div>
+          </article>
+
+          <!-- Post 2 -->
+          <article class="bg-white rounded-lg border border-gray-200">
+            <div class="flex items-center justify-between p-4">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-gradient-to-br from-blue-400 to-cyan-500 rounded-full flex items-center justify-center">
+                  <span class="text-white font-bold">M</span>
+                </div>
+                <div>
+                  <p class="font-semibold">mike_dev</p>
+                  <p class="text-xs text-gray-500">4h ago</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-gradient-to-br from-blue-400 via-cyan-300 to-teal-400 aspect-square w-full"></div>
+
+            <div class="p-4">
+              <div class="flex items-center gap-4 mb-3">
+                <button class="hover:opacity-70 transition-opacity">
+                  <i data-lucide="heart" class="w-7 h-7"></i>
+                </button>
+                <button class="hover:opacity-70 transition-opacity">
+                  <i data-lucide="message-circle" class="w-7 h-7"></i>
+                </button>
+                <button class="hover:opacity-70 transition-opacity">
+                  <i data-lucide="send" class="w-7 h-7"></i>
+                </button>
+              </div>
+
+              <p class="font-semibold mb-2">189 likes</p>
+              <p><span class="font-semibold">mike_dev</span> Coding session ☕💻</p>
+              <button class="text-gray-500 text-sm mt-2">View all 8 comments</button>
+            </div>
+          </article>
+
+          <!-- Post 3 -->
+          <article class="bg-white rounded-lg border border-gray-200">
+            <div class="flex items-center justify-between p-4">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-gradient-to-br from-orange-400 to-red-500 rounded-full flex items-center justify-center">
+                  <span class="text-white font-bold">A</span>
+                </div>
+                <div>
+                  <p class="font-semibold">alex_photo</p>
+                  <p class="text-xs text-gray-500">6h ago</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-gradient-to-br from-yellow-300 via-orange-300 to-pink-400 aspect-square w-full"></div>
+
+            <div class="p-4">
+              <div class="flex items-center gap-4 mb-3">
+                <button class="hover:opacity-70 transition-opacity">
+                  <i data-lucide="heart" class="w-7 h-7"></i>
+                </button>
+                <button class="hover:opacity-70 transition-opacity">
+                  <i data-lucide="message-circle" class="w-7 h-7"></i>
+                </button>
+                <button class="hover:opacity-70 transition-opacity">
+                  <i data-lucide="send" class="w-7 h-7"></i>
+                </button>
+              </div>
+
+              <p class="font-semibold mb-2">567 likes</p>
+              <p><span class="font-semibold">alex_photo</span> Golden hour shots 📸✨</p>
+              <button class="text-gray-500 text-sm mt-2">View all 23 comments</button>
+            </div>
+          </article>
+        </div>
+      </main>
+
+      <!-- Right / messages & friends panes not implemented interactive — presentational only -->
+      <aside class="hidden lg:block w-96 bg-white border-l border-gray-200 overflow-y-auto">
+        <div class="p-6">
+          <h2 class="text-xl font-bold mb-4">Friends</h2>
+          <div class="space-y-4">
+            <div class="flex items-center justify-between p-4 hover:bg-gray-50 rounded-lg">
+              <div class="flex items-center gap-3">
+                <div class="w-14 h-14 bg-gradient-to-br from-pink-400 to-purple-500 rounded-full flex items-center justify-center">
+                  <span class="text-white font-bold text-lg">D</span>
+                </div>
+                <div>
+                  <p class="font-semibold">DevAyoubyt130</p>
+                  <p class="text-sm text-gray-500">Active now</p>
+                </div>
+              </div>
+              <button class="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600">Message</button>
+            </div>
+
+            <div class="flex items-center justify-between p-4 hover:bg-gray-50 rounded-lg">
+              <div class="flex items-center gap-3">
+                <div class="w-14 h-14 bg-gradient-to-br from-blue-400 to-cyan-500 rounded-full flex items-center justify-center">
+                  <span class="text-white font-bold text-lg">A</span>
+                </div>
+                <div>
+                  <p class="font-semibold">Admin</p>
+                  <p class="text-sm text-gray-500">Active now</p>
+                </div>
+              </div>
+              <button class="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600">Message</button>
+            </div>
+
+          </div>
+        </div>
+      </aside>
+
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="flex justify-around items-center bg-white border-t border-gray-200 py-2">
+      <button class="flex flex-col items-center py-2 px-6 text-purple-600">
+        <i data-lucide="home" class="w-7 h-7"></i>
+        <span class="text-xs mt-1">Home</span>
+      </button>
+
+      <button class="flex flex-col items-center py-2 px-6 text-gray-600">
+        <i data-lucide="users" class="w-7 h-7"></i>
+        <span class="text-xs mt-1">Friends</span>
+      </button>
+
+      <button class="flex flex-col items-center py-2 px-6 relative text-gray-600">
+        <i data-lucide="message-circle" class="w-7 h-7"></i>
+        <span class="text-xs mt-1">Messages</span>
+        <span class="absolute top-1 right-4 w-2 h-2 bg-red-500 rounded-full"></span>
+      </button>
+    </nav>
+  </div>
+
+  <script>
+    // Replace lucide placeholders with SVGs
+    if (window.lucide) {
+      window.lucide.replace();
+    }
+    // Note: this HTML is presentational only. The original TSX had React state handlers and dynamic behavior
+    // which are not included here (per request: converted to HTML "as is" for markup & classes).
+  </script>
+</body>
+</html>
